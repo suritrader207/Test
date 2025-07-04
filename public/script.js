@@ -5,8 +5,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const fetchBooks = async () => {
         const response = await fetch('/api/books');
-        const books = await response.json();
-        renderBooks(books);
+        const result = await response.json();
+        if (result.success) {
+            renderBooks(result.data);
+        } else {
+            console.error('Failed to fetch books:', result.error);
+        }
     };
 
     const renderBooks = (books) => {
@@ -50,17 +54,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     formData.append('audioFiles', files[i]);
                 }
 
-                const response = await fetch(`/api/books/${bookId}/upload`, {
+                const response = await fetch(`/api/upload?id=${bookId}`, {
                     method: 'POST',
                     body: formData,
                 });
+                const result = await response.json();
 
-                if (response.ok) {
+                if (result.success) {
                     alert('Audio files uploaded successfully!');
                     fetchBooks(); // Refresh the list
                 } else {
-                    const errorData = await response.json();
-                    alert(`Error uploading files: ${errorData.error}`);
+                    alert(`Error uploading files: ${result.error}`);
                 }
             });
         });
@@ -76,12 +80,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 body: JSON.stringify({ title }),
             });
-            if (response.ok) {
+            const result = await response.json();
+            if (result.success) {
                 newBookTitleInput.value = '';
                 fetchBooks();
             } else {
-                const errorData = await response.json();
-                alert(`Error adding book: ${errorData.error}`);
+                alert(`Error adding book: ${result.error}`);
             }
         } else {
             alert('Please enter a book title.');
