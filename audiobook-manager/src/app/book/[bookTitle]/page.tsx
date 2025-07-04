@@ -31,7 +31,7 @@ function SortableItem({ file, bookTitle, onDelete }: SortableItemProps) {
     <li
       ref={setNodeRef}
       style={style}
-      className="flex flex-col sm:flex-row items-center justify-between bg-gray-800 p-4 rounded-lg shadow-md cursor-grab active:cursor-grabbing border border-gray-700"
+      className="flex flex-col sm:flex-row items-center justify-between bg-gray-700 p-4 rounded-lg shadow-md cursor-grab active:cursor-grabbing"
     >
       <div className="flex items-center flex-grow min-w-0">
         {/* Drag handle - apply listeners here */}
@@ -330,7 +330,7 @@ export default function BookDetailPage() {
         )}
         <button
           onClick={() => router.push('/')}
-          className="mt-8 px-6 py-3 bg-purple-700 text-white rounded-full shadow-lg hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900 text-lg font-semibold transition-colors duration-200"
+          className="mt-8 px-6 py-3 bg-red-700 text-white rounded-full shadow-lg hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-900 text-lg font-semibold transition-colors duration-200"
         >
           Back to Library
         </button>
