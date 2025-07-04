@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { readdir } from 'fs/promises';
 import path from 'path';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const uploadDir = path.join(process.cwd(), 'public', 'uploads');
     const files = await readdir(uploadDir);
