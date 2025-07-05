@@ -1,40 +1,17 @@
 'use server';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { readFile, writeFile } from 'fs/promises';
-import path from 'path';
-import * as fs from 'fs/promises';
+import { PrismaClient } from '@prisma/client';
 
-const DB_FILE_PATH = path.join('/tmp', 'mock-db.json');
+let prisma: PrismaClient;
 
-interface Audiobook {
-  title: string;
-  author: string;
-  imageUrl: string;
-  files: string[];
-}
-
-async function readDb(): Promise<Audiobook[]> {
-  try {
-    const data = await readFile(DB_FILE_PATH, 'utf-8');
-    return JSON.parse(data);
-  } catch (error: unknown) {
-    if (error instanceof Error && 'code' in error) {
-      return [];
-    }
-    console.error('Error reading database:', error);
-    throw error;
+if (process.env.NODE_ENV === 'production') {
+  prisma = new PrismaClient();
+} else {
+  if (!(global as any).prisma) {
+    (global as any).prisma = new PrismaClient();
   }
-}
-
-async function writeDb(data: Audiobook[]): Promise<void> {
-  try {
-    await fs.mkdir(path.dirname(DB_FILE_PATH), { recursive: true });
-    await writeFile(DB_FILE_PATH, JSON.stringify(data, null, 2));
-  } catch (error) {
-    console.error('Error writing to database:', error);
-    throw error;
-  }
+  prisma = (global as any).prisma;
 }
 
 export async function PUT(request: NextRequest) {
@@ -45,24 +22,32 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Old and new book titles are required.' }, { status: 400 });
     }
 
-    const audiobooks: Audiobook[] = await readDb();
-
-    const bookToUpdate = audiobooks.find(b => b.title === oldTitle);
+    const bookToUpdate = await prisma.audiobook.findUnique({
+      where: { title: oldTitle },
+    });
 
     if (!bookToUpdate) {
       return NextResponse.json({ error: 'Book not found.' }, { status: 404 });
     }
 
     // Check if new title already exists
-    if (audiobooks.some(b => b.title === newTitle && b.title !== oldTitle)) {
-      return NextResponse.json({ error: 'New title already exists.' }, { status: 409 });
+    if (newTitle !== oldTitle) {
+      const existingBook = await prisma.audiobook.findUnique({
+        where: { title: newTitle },
+      });
+      if (existingBook) {
+        return NextResponse.json({ error: 'New title already exists.' }, { status: 409 });
+      }
     }
 
-    bookToUpdate.title = newTitle;
-    if (newAuthor !== undefined) bookToUpdate.author = newAuthor;
-    if (newImageUrl !== undefined) bookToUpdate.imageUrl = newImageUrl;
-
-    await writeDb(audiobooks);
+    await prisma.audiobook.update({
+      where: { title: oldTitle },
+      data: {
+        title: newTitle,
+        author: newAuthor !== undefined ? newAuthor : bookToUpdate.author,
+        imageUrl: newImageUrl !== undefined ? newImageUrl : bookToUpdate.imageUrl,
+      },
+    });
 
     return NextResponse.json({ message: `Book title updated from '${oldTitle}' to '${newTitle}'.` });
   } catch (error) {

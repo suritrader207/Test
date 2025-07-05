@@ -1,40 +1,19 @@
 'use server';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { unlink, readFile, writeFile } from 'fs/promises';
+import { unlink } from 'fs/promises';
 import path from 'path';
-import * as fs from 'fs/promises';
+import { PrismaClient } from '@prisma/client';
 
-const DB_FILE_PATH = path.join('/tmp', 'mock-db.json');
+let prisma: PrismaClient;
 
-interface Audiobook {
-  title: string;
-  author: string;
-  imageUrl: string;
-  files: string[];
-}
-
-async function readDb(): Promise<Audiobook[]> {
-  try {
-    const data = await readFile(DB_FILE_PATH, 'utf-8');
-    return JSON.parse(data);
-  } catch (error: unknown) {
-    if (error instanceof Error && 'code' in error) {
-      return [];
-    }
-    console.error('Error reading database:', error);
-    throw error;
+if (process.env.NODE_ENV === 'production') {
+  prisma = new PrismaClient();
+} else {
+  if (!(global as any).prisma) {
+    (global as any).prisma = new PrismaClient();
   }
-}
-
-async function writeDb(data: Audiobook[]): Promise<void> {
-  try {
-    await fs.mkdir(path.dirname(DB_FILE_PATH), { recursive: true });
-    await writeFile(DB_FILE_PATH, JSON.stringify(data, null, 2));
-  } catch (error) {
-    console.error('Error writing to database:', error);
-    throw error;
-  }
+  prisma = (global as any).prisma;
 }
 
 export async function DELETE(request: NextRequest) {
@@ -45,9 +24,9 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Book title and file name are required.' }, { status: 400 });
     }
 
-    const audiobooks: Audiobook[] = await readDb();
-
-    const bookToUpdate = audiobooks.find(b => b.title === bookTitle);
+    const bookToUpdate = await prisma.audiobook.findUnique({
+      where: { title: bookTitle },
+    });
 
     if (!bookToUpdate) {
       return NextResponse.json({ error: 'Book not found.' }, { status: 404 });
@@ -71,7 +50,10 @@ export async function DELETE(request: NextRequest) {
       }
     }
 
-    await writeDb(audiobooks);
+    await prisma.audiobook.update({
+      where: { title: bookTitle },
+      data: { files: bookToUpdate.files },
+    });
 
     return NextResponse.json({ message: `Audio file '${fileName}' deleted successfully from '${bookTitle}'.` });
   } catch (error) {
