@@ -171,7 +171,7 @@ export default function Home() {
         {!showUploadForm && (
           <button
             onClick={() => setShowUploadForm(true)}
-            className="px-8 py-4 bg-red-600 text-white rounded-full shadow-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-900 text-lg font-semibold transition-colors duration-200"
+            className="px-8 py-4 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-900 text-lg font-semibold transition-colors duration-200"
           >
             + Add New Book
           </button>
@@ -218,13 +218,13 @@ export default function Home() {
             <div className="flex flex-col space-y-3 mt-6">
               <button
                 onClick={handleUpload}
-                className="w-full bg-red-600 text-white py-3 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-900 text-lg font-semibold transition-colors duration-200"
+                className="w-full bg-red-600 text-white py-3 px-4 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-900 text-lg font-semibold transition-colors duration-200"
               >
                 Upload Book
               </button>
               <button
                 onClick={() => setShowUploadForm(false)}
-                className="w-full bg-gray-700 text-white py-3 px-4 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-800 text-lg font-semibold transition-colors duration-200"
+                className="w-full bg-gray-700 text-white py-3 px-4 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-800 text-lg font-semibold transition-colors duration-200"
               >
                 Cancel
               </button>

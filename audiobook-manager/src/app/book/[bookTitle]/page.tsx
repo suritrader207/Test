@@ -55,7 +55,7 @@ function SortableItem({ file, bookTitle, onDelete }: SortableItemProps) {
             console.log(`Delete button clicked for file: ${file}`);
             onDelete(file);
           }}
-          className="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors duration-200 text-sm"
+          className="px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 text-sm"
         >
           Delete
         </button>
@@ -334,7 +334,7 @@ export default function BookDetailPage() {
         )}
         <button
           onClick={() => router.push('/')}
-          className="mt-8 px-6 py-3 bg-red-700 text-white rounded-full shadow-lg hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-900 text-lg font-semibold transition-colors duration-200"
+          className="mt-8 px-6 py-3 bg-red-700 text-white rounded-lg shadow-lg hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-900 text-lg font-semibold transition-colors duration-200"
         >
           Back to Library
         </button>
@@ -346,7 +346,7 @@ export default function BookDetailPage() {
     <div className="min-h-screen bg-gray-950 text-gray-100 flex flex-col items-center py-10 px-4 sm:px-6 lg:px-8 font-sans">
       <button
         onClick={() => router.push('/')}
-        className="self-start mb-8 px-6 py-3 bg-red-700 text-white rounded-full shadow-lg hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-900 text-lg font-semibold transition-colors duration-200"
+        className="self-start mb-8 px-6 py-3 bg-red-700 text-white rounded-lg shadow-lg hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-900 text-lg font-semibold transition-colors duration-200"
       >
         &larr; Back to Library
       </button>
@@ -393,13 +393,13 @@ export default function BookDetailPage() {
               <div className="flex justify-end space-x-2">
                 <button
                   onClick={handleSaveEdit}
-                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors duration-200"
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200"
                 >
                   Save
                 </button>
                 <button
                   onClick={handleCancelEdit}
-                  className="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600 transition-colors duration-200"
+                  className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors duration-200"
                 >
                   Cancel
                 </button>
@@ -412,20 +412,20 @@ export default function BookDetailPage() {
               <div className="flex justify-center md:justify-start space-x-3 mb-4">
                 <button
                   onClick={handleEditClick}
-                  className="px-6 py-3 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors duration-200 text-lg font-semibold"
+                  className="px-6 py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors duration-200 text-lg font-semibold"
                 >
                   Edit Book
                 </button>
                 <button
                   onClick={handleDeleteBook}
-                  className="px-6 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors duration-200 text-lg font-semibold"
+                  className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 text-lg font-semibold"
                 >
                   Delete Book
                 </button>
               </div>
               <button
                 onClick={() => setAddingFilesToBook(book.title)}
-                className="px-6 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors duration-200 text-lg font-semibold"
+                className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 text-lg font-semibold"
               >
                 + Add Audio Files
               </button>
@@ -452,13 +452,13 @@ export default function BookDetailPage() {
           <div className="flex justify-end space-x-3 mt-4">
             <button
               onClick={handleUploadAdditionalFiles}
-              className="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-200 text-lg font-semibold"
+              className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 text-lg font-semibold"
             >
               Upload Selected
             </button>
             <button
               onClick={handleCancelAddFiles}
-              className="px-6 py-3 bg-gray-700 text-white rounded-md hover:bg-gray-600 transition-colors duration-200 text-lg font-semibold"
+              className="px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors duration-200 text-lg font-semibold"
             >
               Cancel
             </button>
@@ -485,7 +485,7 @@ export default function BookDetailPage() {
           <div className="flex justify-end mt-6">
             <button
               onClick={handleSaveOrder}
-              className="px-6 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors duration-200 text-lg font-semibold"
+              className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 text-lg font-semibold"
             >
               Save Order
             </button>
