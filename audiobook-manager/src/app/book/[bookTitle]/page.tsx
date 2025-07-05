@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
+//  // No longer needed as an imported object
+
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -43,7 +45,7 @@ function SortableItem({ file, bookTitle, onDelete }: SortableItemProps) {
       </div>
       <div className="flex items-center space-x-2 mt-2 sm:mt-0">
         <audio controls className="w-full sm:w-64 h-10">
-          <source src={`/uploads/${file}`} type="audio/mpeg" />
+          <source src={`/api/audio-serve?fileName=${file}`} type="audio/mpeg" />
           Your browser does not support the audio element.
         </audio>
         <button
@@ -356,12 +358,11 @@ export default function BookDetailPage() {
 
       <div className="w-full max-w-4xl bg-gray-900 rounded-xl shadow-2xl p-6 sm:p-8 lg:p-10 border border-gray-800 mb-12 flex flex-col md:flex-row items-center md:items-start">
         <Image
-          src={book.imageUrl}
+          src={book.imageUrl || defaultBookCover}
           alt={book.title}
           width={192} // w-48 * 4 = 192px
           height={192} // h-48 * 4 = 192px
           className="object-cover rounded-lg shadow-lg md:mr-8 mb-6 md:mb-0"
-          onError={(e) => (e.currentTarget.src = '/default-book-cover.png')}
         />
         <div className="flex-grow text-center md:text-left">
           {editingBook ? (

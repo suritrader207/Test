@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+// import defaultBookCover from '../../public/default-book-cover.png'; // No longer needed as an imported object
 
 interface AudiobookFile {
   title: string;
@@ -134,12 +135,11 @@ export default function Home() {
               >
                 <div className="relative h-48 w-full overflow-hidden flex items-center justify-center bg-gray-900">
                   <Image
-                    src={book.imageUrl}
+                    src={book.imageUrl || defaultBookCover}
                     alt={book.title}
                     width={192} // Example width, adjust as needed
                     height={192} // Example height, adjust as needed
                     className="max-w-full max-h-full object-contain"
-                    onError={(e) => (e.currentTarget.src = '/default-book-cover.png')}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent opacity-70"></div>
                   <div className="absolute bottom-0 left-0 p-4 w-full">
