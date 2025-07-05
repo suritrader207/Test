@@ -229,7 +229,7 @@ export default function BookDetailPage() {
       });
 
       if (response.ok) {
-        setMessage(`Audio file '${fileName}' deleted successfully.`);
+        setMessage(`Audio file '${fileUrlToDelete}' deleted successfully.`);
         fetchBookDetails();
       } else {
         const errorData = await response.json();
