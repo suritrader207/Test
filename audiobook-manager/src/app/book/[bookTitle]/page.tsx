@@ -4,8 +4,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 
-
-
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -25,7 +23,7 @@ interface SortableItemProps {
 }
 
 function SortableItem({ file, bookTitle, onDelete }: SortableItemProps) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: file.fileUrl }); // attributes are spread onto the li element
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: file.fileUrl });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -38,27 +36,22 @@ function SortableItem({ file, bookTitle, onDelete }: SortableItemProps) {
     <li
       ref={setNodeRef}
       style={style}
-      {...attributes}
-      className="flex flex-col sm:flex-row items-center justify-between bg-gray-700 p-4 rounded-lg shadow-md cursor-grab active:cursor-grabbing"
+      className="flex flex-col sm:flex-row items-center justify-between bg-gray-700 p-4 rounded-lg shadow-md"
     >
       <div className="flex items-center flex-grow min-w-0">
-        {/* Drag handle - apply listeners here */}
-        <div className="mr-3 text-gray-400 cursor-grab" {...listeners}>
+        {/* Drag handle */}
+        <div className="mr-3 text-gray-400 cursor-grab" {...listeners} {...attributes}>
           &#x2261; {/* Unicode for three horizontal lines (hamburger icon) */}
         </div>
         <span className="text-gray-200 font-medium text-lg truncate min-w-0">{displayName}</span>
       </div>
       <div className="flex items-center space-x-2 mt-2 sm:mt-0">
-        <audio controls className="w-full sm:w-64 h-10">
-          <source src={file.fileUrl} type="audio/mpeg" />
+        <audio controls playsInline preload="auto" className="w-full sm:w-64 h-10">
+          <source src={`/api/audio-serve?fileName=${encodeURIComponent(file.fileUrl)}`} type="audio/mpeg" />
           Your browser does not support the audio element.
         </audio>
         <button
-          onClick={(e) => {
-            e.stopPropagation(); // Prevent drag from triggering delete
-            console.log(`Delete button clicked for file: ${file.fileUrl}`);
-            onDelete(file.fileUrl);
-          }}
+          onClick={() => onDelete(file.fileUrl)}
           className="px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 text-sm"
         >
           Delete
