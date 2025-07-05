@@ -34,6 +34,7 @@ export async function POST(request: NextRequest) {
     // Upload file to Vercel Blob
     const blob = await put(file.name, file, {
       access: 'public',
+      addRandomSuffix: true,
     });
 
     let book = await prisma.audiobook.findUnique({
