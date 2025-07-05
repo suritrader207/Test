@@ -4,10 +4,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
-import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-
 interface AudiobookFile {
   title: string;
   author: string;
@@ -23,30 +19,17 @@ interface SortableItemProps {
 }
 
 function SortableItem({ file, bookTitle, onDelete }: SortableItemProps) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: file.fileUrl });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
   const displayName = file.originalFileName;
 
   return (
     <li
-      ref={setNodeRef}
-      style={style}
       className="flex flex-col sm:flex-row items-center justify-between bg-gray-700 p-4 rounded-lg shadow-md"
     >
       <div className="flex items-center flex-grow min-w-0">
-        {/* Drag handle */}
-        <div className="mr-3 text-gray-400 cursor-grab" {...listeners} {...attributes}>
-          &#x2261; {/* Unicode for three horizontal lines (hamburger icon) */}
-        </div>
         <span className="text-gray-200 font-medium text-lg truncate min-w-0">{displayName}</span>
       </div>
       <div className="flex items-center space-x-2 mt-2 sm:mt-0">
-        <audio controls playsInline preload="auto" className="w-full sm:w-64 h-10">
+        <audio controls playsInline preload="auto" style={{ width: '300px', height: '50px', border: '5px solid purple', backgroundColor: 'lightgreen', display: 'block', zIndex: 99999 }}>
           <source src={`/api/audio-serve?fileName=${encodeURIComponent(file.fileUrl)}`} type="audio/mpeg" />
           Your browser does not support the audio element.
         </audio>
@@ -74,13 +57,15 @@ export default function BookDetailPage() {
   const [newBookImageUrl, setNewBookImageUrl] = useState<string>('');
   const [audioFiles, setAudioFiles] = useState<{ fileUrl: string; originalFileName: string }[]>([]);
   const [hasOrderChanged, setHasOrderChanged] = useState<boolean>(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
+  useEffect(() => {
+    const userAgent = typeof window.navigator === 'undefined' ? '' : window.navigator.userAgent;
+    const mobile = Boolean(
+      userAgent.match(/Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i)
+    );
+    setIsMobile(mobile);
+  }, []);
 
   const fetchBookDetails = useCallback(async () => {
     try {
@@ -282,49 +267,6 @@ export default function BookDetailPage() {
     setNewBookImageUrl('');
   };
 
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
-
-    if (over && active.id !== over.id) {
-      setAudioFiles((items) => {
-        const oldIndex = items.findIndex(item => item.fileUrl === (active.id as string));
-        const newIndex = items.findIndex(item => item.fileUrl === (over.id as string));
-        const newItems = [...items];
-        const [removed] = newItems.splice(oldIndex, 1);
-        newItems.splice(newIndex, 0, removed);
-        setHasOrderChanged(true);
-        return newItems;
-      });
-    }
-  }
-
-  const handleSaveOrder = async () => {
-    if (!book) return;
-
-    setMessage('Saving new order...');
-    try {
-      const response = await fetch('/api/books/reorder-files', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ bookTitle: book.title, newOrder: audioFiles.map(item => item.fileUrl) }),
-      });
-
-      if (response.ok) {
-        setMessage('Order saved successfully!');
-        setHasOrderChanged(false);
-        fetchBookDetails();
-      } else {
-        const errorData = await response.json();
-        setMessage(`Failed to save order: ${errorData.error}`);
-      }
-    } catch (error) {
-      console.error('Error saving order:', error);
-      setMessage('An error occurred while saving order.');
-    }
-  };
-
   if (!book) {
     return (
       <div className="min-h-screen bg-gray-950 text-gray-100 flex flex-col items-center justify-center py-10 px-4 sm:px-6 lg:px-8 font-sans">
@@ -473,25 +415,11 @@ export default function BookDetailPage() {
         {audioFiles.length === 0 ? (
           <p className="text-gray-400 text-lg text-center py-8">No audio files for this book yet. Add some above!</p>
         ) : (
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <SortableContext items={audioFiles.map(item => item.fileUrl)} strategy={verticalListSortingStrategy}>
-              <ul className="space-y-4">
-                {audioFiles.map((file) => (
-                  <SortableItem key={file.fileUrl} file={file} bookTitle={book.title} onDelete={handleDeleteAudioFile} />
-                ))}
-              </ul>
-            </SortableContext>
-          </DndContext>
-        )}
-        {hasOrderChanged && audioFiles.length > 0 && (
-          <div className="flex justify-end mt-6">
-            <button
-              onClick={handleSaveOrder}
-              className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 text-lg font-semibold"
-            >
-              Save Order
-            </button>
-          </div>
+          <ul className="space-y-4">
+            {audioFiles.map((file) => (
+              <SortableItem key={file.fileUrl} file={file} bookTitle={book.title} onDelete={handleDeleteAudioFile} />
+            ))}
+          </ul>
         )}
       </div>
     </div>
