@@ -124,7 +124,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100 flex flex-col items-center py-10 px-4 sm:px-6 lg:px-8 font-sans">
-      <h1 className="text-5xl font-extrabold text-white mb-12 tracking-tight">My Library</h1>
+      <h1 className="text-5xl font-extrabold text-white mb-12 tracking-tight">Suri's Library</h1>
 
       {message && (
         <div className="bg-red-600 text-white px-6 py-3 rounded-lg shadow-md mb-8 text-center text-lg font-medium animate-fade-in-down">
