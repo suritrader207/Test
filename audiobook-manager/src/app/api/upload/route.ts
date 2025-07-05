@@ -1,4 +1,5 @@
 import { writeFile, readFile } from 'fs/promises';
+import * as fs from 'fs/promises';
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 
@@ -29,11 +30,13 @@ export async function POST(request: NextRequest) {
 
     const buffer = Buffer.from(await file.arrayBuffer());
     const filename = file.name;
-    const filePath = path.join(process.cwd(), 'public', 'uploads', filename);
+    const uploadDir = path.join('/tmp', 'uploads');
+    await fs.mkdir(uploadDir, { recursive: true }); // Ensure directory exists
+    const filePath = path.join(uploadDir, filename);
 
     await writeFile(filePath, buffer);
 
-    const booksFilePath = path.join(process.cwd(), 'public', 'books.json');
+    const booksFilePath = path.join('/tmp', 'books.json');
     let audiobooks: Audiobook[] = [];
 
     try {

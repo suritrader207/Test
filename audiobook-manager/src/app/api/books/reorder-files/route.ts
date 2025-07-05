@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid request data.' }, { status: 400 });
     }
 
-    const booksFilePath = path.join(process.cwd(), 'public', 'books.json');
+    const booksFilePath = path.join('/tmp', 'books.json');
     let audiobooks: Audiobook[] = [];
 
     try {

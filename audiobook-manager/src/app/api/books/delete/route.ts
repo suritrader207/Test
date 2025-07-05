@@ -15,7 +15,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Book title is required.' }, { status: 400 });
     }
 
-    const booksFilePath = path.join(process.cwd(), 'public', 'books.json');
+    const booksFilePath = path.join('/tmp', 'books.json');
     let audiobooks: Audiobook[] = [];
 
     try {
@@ -36,7 +36,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Delete associated audio files
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+    const uploadDir = path.join('/tmp', 'uploads');
     for (const file of bookToDelete.files) {
       try {
         await unlink(path.join(uploadDir, file));

@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Audiobook Manager
 
-## Getting Started
+This is a simple web application for managing your audiobooks, allowing you to upload, organize, and play your audio files.
 
-First, run the development server:
+## Deployment on Vercel
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+This project is configured for easy deployment with [Vercel](https://vercel.com/).
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1.  **Sign up or Log in to Vercel:** If you don't have an account, sign up at [vercel.com](https://vercel.com/).
+2.  **Import Your Project:**
+    *   Go to your Vercel Dashboard.
+    *   Click on "New Project".
+    *   Select your Git repository (e.g., GitHub, GitLab, Bitbucket) where this project is hosted.
+    *   Vercel will automatically detect that it's a Next.js project and configure the build settings.
+3.  **Deploy:** Click "Deploy". Vercel will build and deploy your application.
+4.  **Custom Domains (Optional):** After deployment, you can configure custom domains from your project settings in the Vercel Dashboard.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Local Development
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+To run this project locally, follow these steps:
 
-## Learn More
+1.  **Clone the repository:**
+    ```bash
+    git clone <your-repository-url>
+    cd audiobook-manager
+    ```
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
+3.  **Run the development server:**
+    ```bash
+    npm run dev
+    ```
 
-To learn more about Next.js, take a look at the following resources:
+    Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+-   `src/app/`: Contains the Next.js application pages and API routes.
+-   `public/`: Stores static assets like `books.json`, default cover images, and uploaded audio files.
+-   `components/`: (If applicable) Reusable React components.
 
-## Deploy on Vercel
+## Technologies Used
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+-   Next.js
+-   React
+-   Tailwind CSS
+-   @dnd-kit (for drag and drop functionality)
+-   Node.js (for API routes)

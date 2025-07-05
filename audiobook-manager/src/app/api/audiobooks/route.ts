@@ -4,7 +4,7 @@ import path from 'path';
 
 export async function GET() {
   try {
-    const booksFilePath = path.join(process.cwd(), 'public', 'books.json');
+    const booksFilePath = path.join('/tmp', 'books.json');
     const data = await readFile(booksFilePath, 'utf-8');
     const audiobooks = JSON.parse(data);
     return NextResponse.json({ audiobooks });
