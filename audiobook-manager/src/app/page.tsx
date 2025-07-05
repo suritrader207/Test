@@ -144,7 +144,7 @@ export default function Home() {
               >
                 <div className="relative h-48 w-full overflow-hidden flex items-center justify-center bg-gray-900">
                   <Image
-                    src={book.imageUrl || '/default-book-cover.png'}
+                    src={book.imageUrl || '/default-book-cover.svg'}
                     alt={book.title}
                     width={192} // Example width, adjust as needed
                     height={192} // Example height, adjust as needed

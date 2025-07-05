@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
 
     let book = audiobooks.find(b => b.title === bookTitle);
     if (!book) {
-      book = { title: bookTitle, author: author || 'Unknown Author', imageUrl: imageUrl || '/default-book-cover.png', files: [] }; // Default values
+      book = { title: bookTitle, author: author || 'Unknown Author', imageUrl: imageUrl || '/default-book-cover.svg', files: [] }; // Default values
       audiobooks.push(book);
     } else {
       // Update author and imageUrl if provided for existing book

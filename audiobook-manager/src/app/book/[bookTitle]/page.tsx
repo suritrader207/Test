@@ -359,7 +359,7 @@ export default function BookDetailPage() {
 
       <div className="w-full max-w-4xl bg-gray-900 rounded-xl shadow-2xl p-6 sm:p-8 lg:p-10 border border-gray-800 mb-12 flex flex-col md:flex-row items-center md:items-start">
         <Image
-          src={book.imageUrl || '/default-book-cover.png'}
+          src={book.imageUrl || '/default-book-cover.svg'}
           alt={book.title}
           width={192} // w-48 * 4 = 192px
           height={192} // h-48 * 4 = 192px
