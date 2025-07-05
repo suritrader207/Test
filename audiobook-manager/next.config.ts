@@ -11,6 +11,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'test-3uh8.vercel.app',
       },
+      {
+        protocol: 'https',
+        hostname: 'cdn.kobo.com',
+      },
     ],
   },
 };

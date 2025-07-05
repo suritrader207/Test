@@ -1,13 +1,40 @@
+'use server';
+
 import { writeFile, readFile } from 'fs/promises';
 import * as fs from 'fs/promises';
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
+
+const DB_FILE_PATH = path.join('/tmp', 'mock-db.json');
 
 interface Audiobook {
   title: string;
   author: string; // New field
   imageUrl: string; // New field
   files: string[];
+}
+
+async function readDb(): Promise<Audiobook[]> {
+  try {
+    const data = await readFile(DB_FILE_PATH, 'utf-8');
+    return JSON.parse(data);
+  } catch (error: unknown) {
+    if (error instanceof Error && 'code' in error) {
+      return [];
+    }
+    console.error('Error reading database:', error);
+    throw error;
+  }
+}
+
+async function writeDb(data: Audiobook[]): Promise<void> {
+  try {
+    await fs.mkdir(path.dirname(DB_FILE_PATH), { recursive: true });
+    await writeFile(DB_FILE_PATH, JSON.stringify(data, null, 2));
+  } catch (error) {
+    console.error('Error writing to database:', error);
+    throw error;
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -36,19 +63,7 @@ export async function POST(request: NextRequest) {
 
     await writeFile(filePath, buffer);
 
-    const booksFilePath = path.join('/tmp', 'books.json');
-    let audiobooks: Audiobook[] = [];
-
-    try {
-      const data = await readFile(booksFilePath, 'utf-8');
-      audiobooks = JSON.parse(data);
-    } catch (readError: unknown) {
-      if (readError instanceof Error && 'code' in readError && readError.code !== 'ENOENT') {
-        console.error('Error reading books.json:', readError);
-        return NextResponse.json({ error: 'Error processing books data.' }, { status: 500 });
-      }
-      // If file doesn't exist, audiobooks remains an empty array, which is fine.
-    }
+    const audiobooks: Audiobook[] = await readDb();
 
     let book = audiobooks.find(b => b.title === bookTitle);
     if (!book) {
@@ -61,7 +76,7 @@ export async function POST(request: NextRequest) {
     }
     book.files.push(filename);
 
-    await writeFile(booksFilePath, JSON.stringify(audiobooks, null, 2));
+    await writeDb(audiobooks);
 
     return NextResponse.json({ message: 'File uploaded successfully!', filename, bookTitle });
   } catch (error) {

@@ -1,12 +1,40 @@
+'use server';
+
 import { NextRequest, NextResponse } from 'next/server';
-import { readFile, writeFile, unlink } from 'fs/promises';
+import { unlink, readFile, writeFile } from 'fs/promises';
 import path from 'path';
+import * as fs from 'fs/promises';
+
+const DB_FILE_PATH = path.join('/tmp', 'mock-db.json');
 
 interface Audiobook {
   title: string;
   author: string;
   imageUrl: string;
   files: string[];
+}
+
+async function readDb(): Promise<Audiobook[]> {
+  try {
+    const data = await readFile(DB_FILE_PATH, 'utf-8');
+    return JSON.parse(data);
+  } catch (error: unknown) {
+    if (error instanceof Error && 'code' in error) {
+      return [];
+    }
+    console.error('Error reading database:', error);
+    throw error;
+  }
+}
+
+async function writeDb(data: Audiobook[]): Promise<void> {
+  try {
+    await fs.mkdir(path.dirname(DB_FILE_PATH), { recursive: true });
+    await writeFile(DB_FILE_PATH, JSON.stringify(data, null, 2));
+  } catch (error) {
+    console.error('Error writing to database:', error);
+    throw error;
+  }
 }
 
 export async function DELETE(request: NextRequest) {
@@ -17,19 +45,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Book title and file name are required.' }, { status: 400 });
     }
 
-    const booksFilePath = path.join('/tmp', 'books.json');
-    let audiobooks: Audiobook[] = [];
-
-    try {
-      const data = await readFile(booksFilePath, 'utf-8');
-      audiobooks = JSON.parse(data);
-    } catch (readError: unknown) {
-      if (readError instanceof Error && 'code' in readError && readError.code === 'ENOENT') {
-        return NextResponse.json({ error: 'No books found.' }, { status: 404 });
-      }
-      console.error('Error reading books.json:', readError);
-      return NextResponse.json({ error: 'Error processing books data.' }, { status: 500 });
-    }
+    const audiobooks: Audiobook[] = await readDb();
 
     const bookToUpdate = audiobooks.find(b => b.title === bookTitle);
 
@@ -55,7 +71,7 @@ export async function DELETE(request: NextRequest) {
       }
     }
 
-    await writeFile(booksFilePath, JSON.stringify(audiobooks, null, 2));
+    await writeDb(audiobooks);
 
     return NextResponse.json({ message: `Audio file '${fileName}' deleted successfully from '${bookTitle}'.` });
   } catch (error) {
