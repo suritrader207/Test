@@ -4,7 +4,7 @@ import path from 'path';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const fileName = searchParams.get('fileName');
+  const fileName = decodeURIComponent(searchParams.get('fileName') || '');
 
   if (!fileName) {
     return NextResponse.json({ error: 'File name is required.' }, { status: 400 });

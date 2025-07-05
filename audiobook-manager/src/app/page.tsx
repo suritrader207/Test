@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-// import defaultBookCover from '../../public/default-book-cover.png'; // No longer needed as an imported object
+
+
 
 interface AudiobookFile {
   title: string;
@@ -27,13 +28,21 @@ export default function Home() {
   }, []);
 
   const fetchAudiobooks = async () => {
+    console.log('Fetching audiobooks...');
     try {
       const response = await fetch('/api/audiobooks');
       if (response.ok) {
+        console.log('Audiobooks API response OK.');
         const data = await response.json();
-        setAudiobooks(data.audiobooks);
+        if (data && Array.isArray(data.audiobooks)) {
+          console.log('Audiobooks data valid.', data.audiobooks);
+          setAudiobooks(data.audiobooks);
+        } else {
+          console.error('Invalid data format received from /api/audiobooks', data);
+          setAudiobooks([]); // Set to empty array to prevent errors
+        }
       } else {
-        console.error('Failed to fetch audiobooks');
+        console.error('Failed to fetch audiobooks, response not OK:', response.status, response.statusText);
       }
     } catch (error) {
       console.error('Error fetching audiobooks:', error);
@@ -135,7 +144,7 @@ export default function Home() {
               >
                 <div className="relative h-48 w-full overflow-hidden flex items-center justify-center bg-gray-900">
                   <Image
-                    src={book.imageUrl || defaultBookCover}
+                    src={book.imageUrl || '/default-book-cover.png'}
                     alt={book.title}
                     width={192} // Example width, adjust as needed
                     height={192} // Example height, adjust as needed
