@@ -31,6 +31,33 @@ function SortableItem({ file, bookTitle, onDelete }: SortableItemProps) {
     transition,
   };
 
+  // Helper to extract original filename from Blob URL
+  const getOriginalFilename = (blobUrl: string): string => {
+    try {
+      const url = new URL(blobUrl);
+      const pathname = url.pathname;
+      let lastSegment = pathname.substring(pathname.lastIndexOf('/') + 1);
+
+      // Decode URL-encoded characters (like %20 for space)
+      lastSegment = decodeURIComponent(lastSegment);
+
+      // Regex to match the Vercel Blob random suffix (e.g., -8GN8T28DJBqMTN3)
+      // This pattern looks for a hyphen followed by alphanumeric characters at the end, before the extension
+      const vercelSuffixRegex = /-[a-zA-Z0-9]{10,}(\..*)$/;
+
+      const match = lastSegment.match(vercelSuffixRegex);
+      if (match) {
+        // If a suffix is found, remove it and the preceding hyphen
+        return lastSegment.substring(0, match.index) + match[1];
+      }
+      return lastSegment; // No specific suffix found, return as is
+    } catch (e) {
+      return blobUrl; // Return original if URL is invalid or parsing fails
+    }
+  };
+
+  const displayName = getOriginalFilename(file);
+
   return (
     <li
       ref={setNodeRef}
@@ -42,11 +69,11 @@ function SortableItem({ file, bookTitle, onDelete }: SortableItemProps) {
         <div className="mr-3 text-gray-400 cursor-grab" {...listeners}>
           &#x2261; {/* Unicode for three horizontal lines (hamburger icon) */}
         </div>
-        <span className="text-gray-200 font-medium text-lg truncate min-w-0">{file}</span>
+        <span className="text-gray-200 font-medium text-lg truncate min-w-0">{displayName}</span>
       </div>
       <div className="flex items-center space-x-2 mt-2 sm:mt-0">
         <audio controls className="w-full sm:w-64 h-10">
-          <source src={`/api/audio-serve?fileName=${file}`} type="audio/mpeg" />
+          <source src={file} type="audio/mpeg" />
           Your browser does not support the audio element.
         </audio>
         <button
