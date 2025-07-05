@@ -294,8 +294,8 @@ export default function BookDetailPage() {
 
     if (over && active.id !== over.id) {
       setAudioFiles((items) => {
-        const oldIndex = items.indexOf(active.id as string);
-        const newIndex = items.indexOf(over.id as string);
+        const oldIndex = items.findIndex(item => item.fileUrl === (active.id as string));
+        const newIndex = items.findIndex(item => item.fileUrl === (over.id as string));
         const newItems = [...items];
         const [removed] = newItems.splice(oldIndex, 1);
         newItems.splice(newIndex, 0, removed);
