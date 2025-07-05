@@ -364,6 +364,7 @@ export default function BookDetailPage() {
           width={192} // w-48 * 4 = 192px
           height={192} // h-48 * 4 = 192px
           className="object-cover rounded-lg shadow-lg md:mr-8 mb-6 md:mb-0"
+          priority
         />
         <div className="flex-grow text-center md:text-left">
           {editingBook ? (

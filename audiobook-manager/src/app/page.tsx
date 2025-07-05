@@ -149,6 +149,7 @@ export default function Home() {
                     width={192} // Example width, adjust as needed
                     height={192} // Example height, adjust as needed
                     className="max-w-full max-h-full object-contain"
+                    priority
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent opacity-70"></div>
                   <div className="absolute bottom-0 left-0 p-4 w-full">
