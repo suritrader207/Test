@@ -21,8 +21,8 @@ export async function DELETE(request: NextRequest) {
     try {
       const data = await readFile(booksFilePath, 'utf-8');
       audiobooks = JSON.parse(data);
-    } catch (readError: any) {
-      if (readError.code === 'ENOENT') {
+    } catch (readError: unknown) {
+      if (readError instanceof Error && 'code' in readError && readError.code === 'ENOENT') {
         return NextResponse.json({ error: 'No books found.' }, { status: 404 });
       }
       console.error('Error reading books.json:', readError);
@@ -40,8 +40,8 @@ export async function DELETE(request: NextRequest) {
     for (const file of bookToDelete.files) {
       try {
         await unlink(path.join(uploadDir, file));
-      } catch (fileError: any) {
-        if (fileError.code !== 'ENOENT') {
+      } catch (fileError: unknown) {
+        if (fileError instanceof Error && 'code' in fileError && fileError.code !== 'ENOENT') {
           console.warn(`Could not delete file ${file}:`, fileError);
         }
       }

@@ -23,8 +23,8 @@ export async function PUT(request: NextRequest) {
     try {
       const data = await readFile(booksFilePath, 'utf-8');
       audiobooks = JSON.parse(data);
-    } catch (readError: any) {
-      if (readError.code === 'ENOENT') {
+    } catch (readError: unknown) {
+      if (readError instanceof Error && 'code' in readError && readError.code === 'ENOENT') {
         return NextResponse.json({ error: 'No books found.' }, { status: 404 });
       }
       console.error('Error reading books.json:', readError);

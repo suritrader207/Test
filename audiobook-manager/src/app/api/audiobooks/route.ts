@@ -8,10 +8,12 @@ export async function GET() {
     const data = await readFile(booksFilePath, 'utf-8');
     const audiobooks = JSON.parse(data);
     return NextResponse.json({ audiobooks });
-  } catch (error: any) {
-    if (error.code === 'ENOENT') {
-      // books.json doesn't exist yet, return empty array
-      return NextResponse.json({ audiobooks: [] });
+  } catch (error: unknown) {
+    if (error instanceof Error && 'code' in error) {
+      if (error.code === 'ENOENT') {
+        // books.json doesn't exist yet, return empty array
+        return NextResponse.json({ audiobooks: [] });
+      }
     }
     console.error('Error listing audiobooks:', error);
     return NextResponse.json({ error: 'Error listing audiobooks.' }, { status: 500 });

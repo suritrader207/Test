@@ -39,8 +39,8 @@ export async function POST(request: NextRequest) {
     try {
       const data = await readFile(booksFilePath, 'utf-8');
       audiobooks = JSON.parse(data);
-    } catch (readError: any) {
-      if (readError.code !== 'ENOENT') {
+    } catch (readError: unknown) {
+      if (readError instanceof Error && 'code' in readError && readError.code !== 'ENOENT') {
         console.error('Error reading books.json:', readError);
         return NextResponse.json({ error: 'Error processing books data.' }, { status: 500 });
       }

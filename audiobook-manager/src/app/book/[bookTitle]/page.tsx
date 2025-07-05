@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import Image from 'next/image';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
@@ -20,7 +21,7 @@ interface SortableItemProps {
 }
 
 function SortableItem({ file, bookTitle, onDelete }: SortableItemProps) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: file });
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: file }); // attributes are spread onto the li element
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -63,8 +64,6 @@ function SortableItem({ file, bookTitle, onDelete }: SortableItemProps) {
 export default function BookDetailPage() {
   const router = useRouter();
   const params = useParams();
-  const bookTitle = params.bookTitle ? decodeURIComponent(params.bookTitle as string) : '';
-
   const [book, setBook] = useState<AudiobookFile | null>(null);
   const [message, setMessage] = useState<string>('');
   const [addingFilesToBook, setAddingFilesToBook] = useState<string | null>(null);
@@ -83,25 +82,12 @@ export default function BookDetailPage() {
     })
   );
 
-  useEffect(() => {
-    if (bookTitle) {
-      fetchBookDetails();
-    }
-  }, [bookTitle]);
-
-  useEffect(() => {
-    if (book) {
-      setAudioFiles(book.files);
-      setHasOrderChanged(false);
-    }
-  }, [book]);
-
-  const fetchBookDetails = async () => {
+  const fetchBookDetails = useCallback(async () => {
     try {
       const response = await fetch('/api/audiobooks');
       if (response.ok) {
         const data = await response.json();
-        const foundBook = data.audiobooks.find((b: AudiobookFile) => b.title === bookTitle);
+        const foundBook = data.audiobooks.find((b: AudiobookFile) => b.title === (params.bookTitle ? decodeURIComponent(params.bookTitle as string) : ''));
         setBook(foundBook || null);
         if (!foundBook) {
           setMessage('Book not found.');
@@ -114,13 +100,28 @@ export default function BookDetailPage() {
       console.error('Error fetching audiobooks:', error);
       setMessage('An error occurred while loading book details.');
     }
-  };
+  }, [params.bookTitle]);
+
+  useEffect(() => {
+    if (params.bookTitle) {
+      fetchBookDetails();
+    }
+  }, [params.bookTitle, fetchBookDetails]);
+
+  useEffect(() => {
+    if (book) {
+      setAudioFiles(book.files);
+      setHasOrderChanged(false);
+    }
+  }, [book]);
 
   const handleFilesToAddChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFilesToAdd(event.target.files);
   };
 
   const handleUploadAdditionalFiles = async () => {
+    const bookTitle = params.bookTitle ? decodeURIComponent(params.bookTitle as string) : '';
+
     if (!filesToAdd || filesToAdd.length === 0) {
       setMessage('Please select files to add.');
       return;
@@ -276,13 +277,13 @@ export default function BookDetailPage() {
     setNewBookImageUrl('');
   };
 
-  function handleDragEnd(event: any) {
+  function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
 
-    if (active.id !== over.id) {
+    if (over && active.id !== over.id) {
       setAudioFiles((items) => {
-        const oldIndex = items.indexOf(active.id);
-        const newIndex = items.indexOf(over.id);
+        const oldIndex = items.indexOf(active.id as string);
+        const newIndex = items.indexOf(over.id as string);
         const newItems = [...items];
         const [removed] = newItems.splice(oldIndex, 1);
         newItems.splice(newIndex, 0, removed);
@@ -354,10 +355,12 @@ export default function BookDetailPage() {
       )}
 
       <div className="w-full max-w-4xl bg-gray-900 rounded-xl shadow-2xl p-6 sm:p-8 lg:p-10 border border-gray-800 mb-12 flex flex-col md:flex-row items-center md:items-start">
-        <img
+        <Image
           src={book.imageUrl}
           alt={book.title}
-          className="w-48 h-48 object-cover rounded-lg shadow-lg md:mr-8 mb-6 md:mb-0"
+          width={192} // w-48 * 4 = 192px
+          height={192} // h-48 * 4 = 192px
+          className="object-cover rounded-lg shadow-lg md:mr-8 mb-6 md:mb-0"
           onError={(e) => (e.currentTarget.src = '/default-book-cover.png')}
         />
         <div className="flex-grow text-center md:text-left">

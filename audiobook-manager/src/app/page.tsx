@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 interface AudiobookFile {
   title: string;
@@ -132,9 +133,11 @@ export default function Home() {
                 onClick={() => handleBookClick(book.title)}
               >
                 <div className="relative h-48 w-full overflow-hidden flex items-center justify-center bg-gray-900">
-                  <img
+                  <Image
                     src={book.imageUrl}
                     alt={book.title}
+                    width={192} // Example width, adjust as needed
+                    height={192} // Example height, adjust as needed
                     className="max-w-full max-h-full object-contain"
                     onError={(e) => (e.currentTarget.src = '/default-book-cover.png')}
                   />
