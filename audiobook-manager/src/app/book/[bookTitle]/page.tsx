@@ -79,7 +79,7 @@ export default function BookDetailPage() {
   const [newBookTitle, setNewBookTitle] = useState<string>('');
   const [newBookAuthor, setNewBookAuthor] = useState<string>('');
   const [newBookImageUrl, setNewBookImageUrl] = useState<string>('');
-  const [audioFiles, setAudioFiles] = useState<string[]>([]);
+  const [audioFiles, setAudioFiles] = useState<{ fileUrl: string; originalFileName: string }[]>([]);
   const [hasOrderChanged, setHasOrderChanged] = useState<boolean>(false);
 
   const sensors = useSensors(
