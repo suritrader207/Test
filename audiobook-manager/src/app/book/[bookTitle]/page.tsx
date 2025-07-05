@@ -15,53 +15,30 @@ interface AudiobookFile {
   author: string;
   imageUrl: string;
   files: string[];
+  originalFileNames: string[];
 }
 
 interface SortableItemProps {
-  file: string;
+  file: { fileUrl: string; originalFileName: string };
   bookTitle: string;
   onDelete: (fileName: string) => void;
 }
 
 function SortableItem({ file, bookTitle, onDelete }: SortableItemProps) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: file }); // attributes are spread onto the li element
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: file.fileUrl }); // attributes are spread onto the li element
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
   };
 
-  // Helper to extract original filename from Blob URL
-  const getOriginalFilename = (blobUrl: string): string => {
-    try {
-      const url = new URL(blobUrl);
-      const pathname = url.pathname;
-      let lastSegment = pathname.substring(pathname.lastIndexOf('/') + 1);
-
-      // Decode URL-encoded characters (like %20 for space)
-      lastSegment = decodeURIComponent(lastSegment);
-
-      // Regex to match the Vercel Blob random suffix (e.g., -8GN8T28DJBqMTN3)
-      // This pattern looks for a hyphen followed by alphanumeric characters at the end, before the extension
-      const vercelSuffixRegex = /-[a-zA-Z0-9]{10,}(\..*)$/;
-
-      const match = lastSegment.match(vercelSuffixRegex);
-      if (match) {
-        // If a suffix is found, remove it and the preceding hyphen
-        return lastSegment.substring(0, match.index) + match[1];
-      }
-      return lastSegment; // No specific suffix found, return as is
-    } catch (e) {
-      return blobUrl; // Return original if URL is invalid or parsing fails
-    }
-  };
-
-  const displayName = getOriginalFilename(file);
+  const displayName = file.originalFileName;
 
   return (
     <li
       ref={setNodeRef}
       style={style}
+      {...attributes}
       className="flex flex-col sm:flex-row items-center justify-between bg-gray-700 p-4 rounded-lg shadow-md cursor-grab active:cursor-grabbing"
     >
       <div className="flex items-center flex-grow min-w-0">
@@ -73,14 +50,14 @@ function SortableItem({ file, bookTitle, onDelete }: SortableItemProps) {
       </div>
       <div className="flex items-center space-x-2 mt-2 sm:mt-0">
         <audio controls className="w-full sm:w-64 h-10">
-          <source src={file} type="audio/mpeg" />
+          <source src={file.fileUrl} type="audio/mpeg" />
           Your browser does not support the audio element.
         </audio>
         <button
           onClick={(e) => {
             e.stopPropagation(); // Prevent drag from triggering delete
-            console.log(`Delete button clicked for file: ${file}`);
-            onDelete(file);
+            console.log(`Delete button clicked for file: ${file.fileUrl}`);
+            onDelete(file.fileUrl);
           }}
           className="px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 text-sm"
         >
@@ -140,7 +117,12 @@ export default function BookDetailPage() {
 
   useEffect(() => {
     if (book) {
-      setAudioFiles(book.files);
+      // Combine files and originalFileNames into a single array of objects
+      const combinedFiles = book.files.map((fileUrl, index) => ({
+        fileUrl: fileUrl,
+        originalFileName: book.originalFileNames[index] || 'Unknown File',
+      }));
+      setAudioFiles(combinedFiles);
       setHasOrderChanged(false);
     }
   }, [book]);
@@ -231,9 +213,9 @@ export default function BookDetailPage() {
     }
   };
 
-  const handleDeleteAudioFile = async (fileName: string) => {
-    console.log(`handleDeleteAudioFile called for: ${fileName}`);
-    if (!book || !confirm(`Are you sure you want to delete the audio file '${fileName}' from '${book.title}'?`)) {
+  const handleDeleteAudioFile = async (fileUrlToDelete: string) => {
+    console.log(`handleDeleteAudioFile called for: ${fileUrlToDelete}`);
+    if (!book || !confirm(`Are you sure you want to delete the audio file '${fileUrlToDelete}' from '${book.title}'?`)) {
       return;
     }
 
@@ -243,7 +225,7 @@ export default function BookDetailPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ bookTitle: book.title, fileName: fileName }),
+        body: JSON.stringify({ bookTitle: book.title, fileName: fileUrlToDelete }),
       });
 
       if (response.ok) {
@@ -333,7 +315,7 @@ export default function BookDetailPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ bookTitle: book.title, newOrder: audioFiles }),
+        body: JSON.stringify({ bookTitle: book.title, newOrder: audioFiles.map(item => item.fileUrl) }),
       });
 
       if (response.ok) {
@@ -390,7 +372,7 @@ export default function BookDetailPage() {
           alt={book.title}
           width={192} // w-48 * 4 = 192px
           height={192} // h-48 * 4 = 192px
-          className="object-cover rounded-lg shadow-lg md:mr-8 mb-6 md:mb-0"
+          className="object-cover rounded-lg shadow-lg md:mr-8 mb-6 md:mb-0 w-32 h-32 sm:w-48 sm:h-48"
           priority
         />
         <div className="flex-grow text-center md:text-left">
@@ -434,7 +416,7 @@ export default function BookDetailPage() {
             </div>
           ) : (
             <>
-              <h1 className="text-4xl font-extrabold text-white mb-2">{book.title}</h1>
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-2">{book.title}</h1>
               <p className="text-gray-300 text-xl mb-4">by {book.author}</p>
               <div className="flex justify-center md:justify-start space-x-3 mb-4">
                 <button
@@ -499,10 +481,10 @@ export default function BookDetailPage() {
           <p className="text-gray-400 text-lg text-center py-8">No audio files for this book yet. Add some above!</p>
         ) : (
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <SortableContext items={audioFiles} strategy={verticalListSortingStrategy}>
+            <SortableContext items={audioFiles.map(item => item.fileUrl)} strategy={verticalListSortingStrategy}>
               <ul className="space-y-4">
                 {audioFiles.map((file) => (
-                  <SortableItem key={file} file={file} bookTitle={book.title} onDelete={handleDeleteAudioFile} />
+                  <SortableItem key={file.fileUrl} file={file} bookTitle={book.title} onDelete={handleDeleteAudioFile} />
                 ))}
               </ul>
             </SortableContext>

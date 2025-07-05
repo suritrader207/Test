@@ -124,7 +124,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100 flex flex-col items-center py-10 px-4 sm:px-6 lg:px-8 font-sans">
-      <h1 className="text-5xl font-extrabold text-white mb-12 tracking-tight">Suri&apos;s Library</h1>
+      <h1 className="text-3xl sm:text-5xl font-extrabold text-white mb-12 tracking-tight">Suri&apos;s Library</h1>
 
       {message && (
         <div className="bg-red-600 text-white px-6 py-3 rounded-lg shadow-md mb-8 text-center text-lg font-medium animate-fade-in-down">
@@ -142,7 +142,7 @@ export default function Home() {
               <div key={bookIndex} className="bg-gray-800 rounded-lg shadow-lg overflow-hidden flex flex-col transform transition-transform duration-200 hover:scale-105 cursor-pointer"
                 onClick={() => handleBookClick(book.title)}
               >
-                <div className="relative h-48 w-full overflow-hidden flex items-center justify-center bg-gray-900">
+                <div className="relative h-48 w-full overflow-hidden flex items-center justify-center bg-gray-900 sm:h-56">
                   <Image
                     src={book.imageUrl || '/default-book-cover.svg'}
                     alt={book.title}

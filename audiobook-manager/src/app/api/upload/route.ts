@@ -48,6 +48,7 @@ export async function POST(request: NextRequest) {
           author: author || 'Unknown Author',
           imageUrl: imageUrl || '/default-book-cover.svg',
           files: [blob.url],
+          originalFileNames: [file.name],
         },
       });
     } else {
@@ -55,10 +56,11 @@ export async function POST(request: NextRequest) {
       if (author) book.author = author;
       if (imageUrl) book.imageUrl = imageUrl;
       // Add new file to existing book
-      const updatedFiles = [...book.files, blob.url];
+      const updatedFiles = [...(book.files || []), blob.url];
+      const updatedOriginalFileNames = [...(book.originalFileNames || []), file.name];
       await prisma.audiobook.update({
         where: { title: bookTitle },
-        data: { files: updatedFiles },
+        data: { files: updatedFiles, originalFileNames: updatedOriginalFileNames },
       });
     }
 
